@@ -1,31 +1,72 @@
 import 'phaser'
 import baseConfig from '@/constants/config'
+import { assetsBaseUrl, pirateShip } from '@constants/assets'
 
 export class OpenWorld extends Phaser.Scene {
+    ship: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | null
+    cursors: Phaser.Types.Input.Keyboard.CursorKeys | null
+    shipRotation: number
+
+    constructor() {
+        super({key: 'OpenWorld'})
+        this.ship = null
+        this.cursors = null
+        this.shipRotation = 0
+    }
+
     preload() {
-        this.load.setBaseURL('https://labs.phaser.io')
-        this.load.image('bg', 'assets/skies/darkstone.png')
-        this.load.atlas('flares', 'assets/particles/flares.png', 'assets/particles/flares.json')
+        this.load.setBaseURL(assetsBaseUrl)
+        this.load.spritesheet('ship', pirateShip, { frameWidth: 205, frameHeight: 205})
+        this.cursors = this.input.keyboard?.createCursorKeys() || null
     }
 
     create() {
-        const shape1 = new Phaser.Geom.Circle(0, 0, 160)
+        this.ship = this.physics.add.sprite(0, 0, 'ship')
+        this.ship.setCollideWorldBounds(true)
+        this.ship.setScale(0.5)
+    }
 
-        const emitter = this.add.particles(400, 300, 'flares', {
-            frame: { frames: ['red', 'green', 'blue', 'white', 'yellow'], cycle: true },
-            blendMode: 'ADD',
-            lifespan: 500,
-            quantity: 4,
-            scale: { start: 0.5, end: 0.1 }
-        })
-    
-        emitter.addEmitZone({ type: 'edge', source: shape1, quantity: 64, total: 1 })
+    update(): void {
+        if (this.cursors?.left.isDown) {
+            this.ship?.setRotation(-1.5)
+            this.ship?.setVelocityX(-160)
+        }
+        else if (this.cursors?.right.isDown) {
+            this.ship?.setRotation(1.5)
+            this.ship?.setVelocityX(160)
+        }
+        else {
+            this.ship?.setVelocityX(0)
+        }
+
+        if (this.cursors?.up.isDown) {
+            this.ship?.setRotation(0)
+            this.ship?.setVelocityY(-160)
+        }
+        else if (this.cursors?.down.isDown) {
+            this.ship?.setRotation(3.15)
+            this.ship?.setVelocityY(160)
+        }
+        else {
+            this.ship?.setVelocityY(0)
+        }
+
     }
 
 
     static config: Phaser.Types.Core.GameConfig = {
         ...baseConfig,
-        scene: OpenWorld
+        scene: OpenWorld,
+        backgroundColor: '#1c2842',
+        physics: {
+            default: 'arcade',
+            matter: {
+                gravity: {
+                    x: 0,
+                    y: 0
+                }
+            }
+        },
     }
 }
 

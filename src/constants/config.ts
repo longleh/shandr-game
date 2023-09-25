@@ -7,9 +7,7 @@ export const baseConfig: Partial<Phaser.Types.Core.GameConfig> = {
     parent: 'game',
     type: Phaser.AUTO,
     scale: {
-        // Fit to window
         mode: Phaser.Scale.FIT,
-        // Center vertically and horizontally
     },
 }
 
